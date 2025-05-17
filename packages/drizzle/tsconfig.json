@@ -1,9 +1,9 @@
 {
-  "extends": "@budio/typescript-config/react-library.json",
+  "extends": "@budio/typescript-config/base.json",
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@budio/web-ui/*": ["./src/*"]
+      "@budio/drizzle/*": ["./src/*"]
     }
   },
   "include": ["."],

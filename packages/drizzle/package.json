@@ -1,0 +1,24 @@
+{
+  "name": "@budio/drizzle",
+  "version": "0.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "push": "npx drizzle-kit push"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^1.0.0",
+    "dotenv": "^16.5.0",
+    "drizzle-orm": "^0.43.1",
+    "drizzle-zod": "^0.7.1",
+    "@budio/zod": "workspace:*"
+  },
+  "devDependencies": {
+    "drizzle-kit": "^0.31.1",
+    "tsx": "^4.19.4"
+  },
+  "exports": {
+    "./db": "./src/index.ts",
+    "./schema": "./src/schema.ts"
+  }
+}
