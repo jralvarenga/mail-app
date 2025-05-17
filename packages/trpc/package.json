@@ -1,0 +1,36 @@
+{
+  "name": "@budio/trpc",
+  "version": "1.0.0",
+  "description": "",
+  "types": "./src/routers/_app.ts",
+  "exports": {
+    "./client": "./src/client.tsx",
+    "./server": "./src/server.ts",
+    "./init": "./src/init.ts",
+    "./router": "./src/routers/_app.ts",
+    "./context": "./src/server/context.ts"
+  },
+  "scripts": {},
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@budio/drizzle": "workspace:*",
+    "@budio/auth": "workspace:*",
+    "@budio/zod": "workspace:*",
+    "@budio/typescript-config": "workspace:*",
+    "@clerk/nextjs": "^6.15.0",
+    "@tanstack/react-query": "^5.74.0",
+    "@trpc/client": "^11.1.0",
+    "@trpc/react-query": "^11.1.0",
+    "@trpc/server": "^11.1.0",
+    "client-only": "^0.0.1",
+    "server-only": "^0.0.1",
+    "superjson": "^2.2.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0"
+  }
+}

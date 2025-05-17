@@ -7,5 +7,10 @@
   },
   "dependencies": {
     "zod": "^3.24.2"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./utils": "./src/utils.ts",
+    "./types": "./src/types.ts"
   }
 }

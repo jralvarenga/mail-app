@@ -1,0 +1,11 @@
+{
+  "extends": "@budio/typescript-config/base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@budio/trpc/*": ["./src/*"]
+    },
+  },
+  "include": ["src"],
+  "exclude": ["node_modules"]
+}

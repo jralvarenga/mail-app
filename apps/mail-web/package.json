@@ -12,6 +12,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@budio/trpc": "workspace:*",
     "@budio/web-ui": "workspace:*",
     "@budio/auth": "workspace:*",
     "@budio/drizzle": "workspace:*",

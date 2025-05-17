@@ -1,10 +1,14 @@
 'use client'
 
 import { authClient } from "@budio/auth/client"
+import { trpc } from "@budio/trpc/client";
 import { Button } from "@budio/web-ui/components/ui/button"
 import { useRouter } from "next/navigation";
 
 export default function Page() {
+  const query = trpc.gmail.list.useQuery()
+  console.log(query);
+  
   const router = useRouter()
 
   async function logout() {

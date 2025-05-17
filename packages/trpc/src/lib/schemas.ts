@@ -1,4 +1,5 @@
-import { z } from "zod"
+import { _ClippingModel } from "@copi/prisma/zod"
+import z from "zod"
 
 export const ResponseSchema = z.object({
   success: z.boolean(),
