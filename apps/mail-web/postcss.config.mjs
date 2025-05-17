@@ -1,0 +1,1 @@
+export { default } from "@budio/web-ui/postcss.config";

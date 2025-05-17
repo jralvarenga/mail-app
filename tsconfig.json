@@ -1,0 +1,4 @@
+{
+  "extends": "@budio/typescript-config/base.json"
+}
+
