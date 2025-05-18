@@ -50,3 +50,34 @@ export const IdTokensArraySchema = z.array(
     token: IdTokenSchema,
   }),
 )
+
+export const EmailMessageSchema = z.object({
+  id: z.string(),
+  threadId: z.string(),
+  from: z.string(),
+  to: z.string(),
+  subject: z.string(),
+  date: z.string(),
+  body: z.string(),
+  snippet: z.string(),
+  isRead: z.boolean(),
+})
+
+export const ChatParticipantSchema = z.object({
+  email: z.string(),
+  name: z.string(),
+  lastMessageDate: z.string(),
+  unreadCount: z.number(),
+  messages: z.array(EmailMessageSchema),
+})
+
+export const ThreadedMessageSchema: z.ZodType = EmailMessageSchema.extend({
+  replies: z.array(z.lazy(() => ThreadedMessageSchema)),
+  isReply: z.boolean(),
+})
+
+export const ThreadedChatParticipantSchema = ChatParticipantSchema.omit({
+  messages: true,
+}).extend({
+  messages: z.array(ThreadedMessageSchema),
+})
