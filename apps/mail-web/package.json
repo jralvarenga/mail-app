@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@budio/trpc": "workspace:*",
+    "@budio/zod": "workspace:*",
     "@budio/web-ui": "workspace:*",
     "@budio/auth": "workspace:*",
     "@budio/drizzle": "workspace:*",

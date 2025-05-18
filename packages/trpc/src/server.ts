@@ -17,7 +17,6 @@ export const { trpc, HydrateClient } = createHydrationHelpers<typeof appRouter>(
   getQueryClient,
 )
 
-
 /**
  * adapter
  */

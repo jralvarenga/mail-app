@@ -13,10 +13,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
       disableTransitionOnChange
       enableColorScheme
     >
-
-<TRPCProvider>
-      {children}
-      </TRPCProvider>
+      <TRPCProvider>{children}</TRPCProvider>
     </NextThemesProvider>
   )
 }
