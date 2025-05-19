@@ -3,7 +3,7 @@
 import { authClient } from "@budio/auth/client"
 import { BudioLayout } from "@budio/web-ui/components/budio-layout"
 import { AccountSwitcherAccountType } from "@budio/zod/types"
-import { useParams, useRouter } from "next/navigation"
+import { useRouter } from "next/navigation"
 import { useAccounts } from "@budio/lib/hooks/use-accounts"
 import { useEffect } from "react"
 
@@ -20,9 +20,8 @@ export function BudioLayoutWrapper({
   defaultCollapsed,
   defaultLayout,
 }: Props) {
-  const { updateState, changeSelectedAccount } = useAccounts()
+  const { updateState, changeSelectedAccount, state } = useAccounts()
   const { data } = authClient.useSession()
-  const { email } = useParams()
   const router = useRouter()
 
   function onAccountChange(email: string) {
@@ -30,7 +29,6 @@ export function BudioLayoutWrapper({
     if (!account) return
 
     changeSelectedAccount(account)
-    router.push(`/mail/${account.email}`)
   }
 
   useEffect(() => {
@@ -40,27 +38,13 @@ export function BudioLayoutWrapper({
     })
   }, [accounts])
 
-  useEffect(() => {
-    if (accounts && email) {
-      const account = accounts.find((account) => account.email === email)
-      if (account) {
-        changeSelectedAccount(account)
-      } else {
-        // TODO: prevent user to go on other emails
-        // router.back()
-      }
-    }
-  }, [email, accounts])
-
   return (
     <BudioLayout
       defaultLayout={defaultLayout}
       defaultCollapsed={defaultCollapsed}
-      accounts={accounts}
+      accounts={state.accounts}
       switchAccount={onAccountChange}
-      selectedAccountEmail={
-        (email as string) ? (email as string).replaceAll("%40", "@") : ""
-      }
+      selectedAccountEmail={state.selectedAccount?.email || ""}
       logout={async () => {
         authClient.signOut({
           fetchOptions: { onSuccess: () => router.push("/login") },

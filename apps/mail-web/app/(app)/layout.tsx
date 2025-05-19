@@ -57,6 +57,8 @@ export default async function AppLayout({
       const decodedIdToken: IdTokenType = await jwtDecode(idToken!)
 
       return {
+        id: account.id,
+        accountId: account.accountId,
         email: decodedIdToken.email,
         name: decodedIdToken.name,
         provider: account.provider,

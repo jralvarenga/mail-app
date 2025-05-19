@@ -1,9 +1,9 @@
 import { createTRPCRouter } from "../init"
-import { gmailRouter } from "./gmail"
+import { mailRouter } from "./mail"
 import { userRouter } from "./user"
 
 export const appRouter = createTRPCRouter({
-  gmail: gmailRouter,
+  mail: mailRouter,
   user: userRouter,
 })
 

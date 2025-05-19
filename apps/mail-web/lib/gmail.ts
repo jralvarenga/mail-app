@@ -24,11 +24,13 @@ function extractPlainText(payload: any): string {
 async function listMessageIds(
   accessToken: string,
   userId: string,
-): Promise<string[]> {
+  pageToken?: string,
+): Promise<{ messages: string[]; nextPageToken: string }> {
   const url = new URL(`${GMAIL_API}/users/${userId}/messages`)
   url.searchParams.append("maxResults", EMAIL_COUNT)
   url.searchParams.append("labelIds", "INBOX")
   url.searchParams.append("q", "is:important")
+  if (pageToken) url.searchParams.set("pageToken", pageToken)
 
   const response = await fetch(url.toString(), {
     headers: { Authorization: `Bearer ${accessToken}` },
@@ -39,7 +41,10 @@ async function listMessageIds(
   }
 
   const data = await response.json()
-  return data.messages?.map((msg: any) => msg.id) || []
+  return {
+    messages: data.messages?.map((msg: any) => msg.id) || [],
+    nextPageToken: data.nextPageToken || "",
+  }
 }
 
 async function getMessage(
@@ -114,33 +119,36 @@ async function getThreadMessages(
 }
 
 // 🔁 Main function for traditional mail client format
-export async function fetchGmail(
+export async function fetchGmailInbox(
   accessToken: string,
   userId: string,
-): Promise<EmailMessageType[]> {
-  const messageIds = await listMessageIds(accessToken, userId)
-  const seenThreads = new Set<string>()
+  nextPageToken?: string,
+): Promise<{ messages: EmailMessageType[]; nextPageToken: string }> {
+  const { messages: messageIds, nextPageToken: newPageToken } =
+    await listMessageIds(accessToken, userId, nextPageToken)
+  // const seenThreads = new Set<string>()
   const messages: EmailMessageType[] = []
 
   for (const messageId of messageIds) {
     const email = await getMessage(accessToken, messageId, userId)
 
     // Skip if we've already processed this thread
-    if (seenThreads.has(email.threadId)) continue
+    // if (seenThreads.has(email.threadId)) continue
 
-    // Get all messages in this thread
-    const threadMessages = await getThreadMessages(
-      accessToken,
-      email.threadId,
-      userId,
-    )
-    messages.push(...threadMessages)
-
-    seenThreads.add(email.threadId)
+    // // Get all messages in this thread
+    // const threadMessages = await getThreadMessages(
+    //   accessToken,
+    //   email.threadId,
+    //   userId,
+    // )
+    messages.push(email)
   }
 
   // Sort by date, most recent first
-  return messages.sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
-  )
+  return {
+    messages: messages.sort(
+      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+    ),
+    nextPageToken: newPageToken,
+  }
 }

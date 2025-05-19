@@ -27,7 +27,7 @@ export function AccountSwitcher({
 }: AccountSwitcherProps) {
   return (
     <Select
-      defaultValue={selectedAccount}
+      value={selectedAccount}
       onValueChange={(email) => {
         switchAccount(email)
       }}

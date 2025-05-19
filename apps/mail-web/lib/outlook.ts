@@ -11,14 +11,33 @@ function parseDate(dateString: string): string {
   return new Date(dateString).toUTCString()
 }
 
-async function listFocusedMessages(accessToken: string): Promise<any[]> {
-  const url = new URL(`${GRAPH_API}/me/messages`)
-  url.searchParams.append("$top", EMAIL_COUNT)
-  url.searchParams.append("$filter", "inferenceClassification eq 'focused'")
-  url.searchParams.append(
-    "$select",
-    "id,subject,from,toRecipients,conversationId,isRead,bodyPreview,receivedDateTime",
-  )
+function parseMessage(msg: any): EmailMessageType {
+  return {
+    id: msg.id,
+    threadId: msg.conversationId,
+    from: parseAddress(msg.from),
+    to: msg.toRecipients?.map(parseAddress).join(", "),
+    subject: msg.subject,
+    date: parseDate(msg.receivedDateTime),
+    body: msg.bodyPreview,
+    snippet: msg.bodyPreview,
+    isRead: msg.isRead,
+  }
+}
+
+async function listFocusedMessages(
+  accessToken: string,
+  pageToken?: string,
+): Promise<{ messages: any[]; nextPageToken: string }> {
+  const url = new URL(pageToken ? pageToken : `${GRAPH_API}/me/messages`)
+  if (!pageToken) {
+    url.searchParams.append("$top", EMAIL_COUNT)
+    url.searchParams.append("$filter", "inferenceClassification eq 'focused'")
+    url.searchParams.append(
+      "$select",
+      "id,subject,from,toRecipients,conversationId,isRead,bodyPreview,receivedDateTime",
+    )
+  }
 
   const response = await fetch(url.toString(), {
     headers: { Authorization: `Bearer ${accessToken}` },
@@ -29,7 +48,11 @@ async function listFocusedMessages(accessToken: string): Promise<any[]> {
   }
 
   const data = await response.json()
-  return data.value || []
+
+  return {
+    messages: data.value || [],
+    nextPageToken: data["@odata.nextLink"] || "",
+  }
 }
 
 async function getConversationMessages(
@@ -53,38 +76,32 @@ async function getConversationMessages(
   }
 
   const data = await response.json()
-  return data.value.map(
-    (msg: any): EmailMessageType => ({
-      id: msg.id,
-      threadId: msg.conversationId,
-      from: parseAddress(msg.from),
-      to: msg.toRecipients?.map(parseAddress).join(", "),
-      subject: msg.subject,
-      date: parseDate(msg.receivedDateTime),
-      body: msg.bodyPreview,
-      snippet: msg.bodyPreview,
-      isRead: msg.isRead,
-    }),
-  )
+  return data.value.map((msg: any): EmailMessageType => parseMessage(msg))
 }
 
-export async function fetchOutlook(
+export async function fetchOutlookInbox(
   accessToken: string,
-): Promise<EmailMessageType[]> {
-  const initialMessages = await listFocusedMessages(accessToken)
+  pageToken?: string,
+): Promise<{ messages: EmailMessageType[]; nextPageToken: string }> {
+  const { messages, nextPageToken } = await listFocusedMessages(
+    accessToken,
+    pageToken,
+  )
   const seenConversations = new Set<string>()
   const allMessages: EmailMessageType[] = []
 
-  for (const msg of initialMessages) {
-    const convId = msg.conversationId
-    if (seenConversations.has(convId)) continue
+  for (const msg of messages) {
+    // const convId = msg.conversationId
+    // if (seenConversations.has(convId)) continue
 
-    const threadMessages = await getConversationMessages(accessToken, convId)
-    allMessages.push(...threadMessages)
-    seenConversations.add(convId)
+    // const threadMessages = await getConversationMessages(accessToken, convId)
+    // allMessages.push(...threadMessages)
+    // seenConversations.add(convId)
+    allMessages.push(parseMessage(msg))
   }
 
-  return allMessages.sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
-  )
+  return {
+    messages: allMessages,
+    nextPageToken: nextPageToken,
+  }
 }

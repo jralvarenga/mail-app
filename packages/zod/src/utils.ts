@@ -83,6 +83,8 @@ export const ThreadedChatParticipantSchema = ChatParticipantSchema.omit({
 })
 
 export const AccountSwitcherAccountSchema = z.object({
+  id: z.string(),
+  accountId: z.string(),
   email: z.string(),
   name: z.string(),
   provider: z.string(),
