@@ -1,0 +1,31 @@
+{
+  "name": "@budio/lib",
+  "version": "0.0.0",
+  "private": true,
+  "exports": {
+    "./helpers/*": "./src/helpers/*.ts",
+    "./hooks/*": "./src/hooks/*.tsx",
+    "./providers/*": "./src/providers/*.tsx"
+  },
+  "scripts": {
+    "lint": "eslint . --max-warnings 0",
+    "check-types": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@budio/eslint-config": "workspace:*",
+    "@budio/typescript-config": "workspace:*",
+    "@turbo/gen": "^2.4.4",
+    "@types/node": "^22.13.10",
+    "@types/react": "19.0.12",
+    "@types/react-dom": "19.0.4",
+    "eslint": "^9.23.0",
+    "typescript": "5.8.2"
+  },
+  "dependencies": {
+    "@budio/auth": "workspace:*",
+    "@budio/zod": "workspace:*",
+    "jotai": "^2.12.2",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  }
+}

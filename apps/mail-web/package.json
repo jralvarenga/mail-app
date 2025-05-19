@@ -12,15 +12,18 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@budio/trpc": "workspace:*",
-    "@budio/zod": "workspace:*",
-    "@budio/web-ui": "workspace:*",
     "@budio/auth": "workspace:*",
+    "@budio/lib": "workspace:*",
     "@budio/drizzle": "workspace:*",
+    "@budio/trpc": "workspace:*",
+    "@budio/web-ui": "workspace:*",
+    "@budio/zod": "workspace:*",
     "better-auth": "^1.2.8",
+    "jwt-decode": "^4.0.0",
     "lucide-react": "^0.475.0",
     "next": "^15.2.3",
     "next-themes": "^0.4.4",
+    "jotai": "^2.12.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
