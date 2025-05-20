@@ -44,14 +44,16 @@ export default async function AppLayout({
       try {
         idToken = await getIdToken(account.id, account.provider)
       } catch (err: any) {
-        const { idToken: newIdToken } = await auth.api.refreshToken({
-          headers: await headers(),
-          body: {
-            accountId: account.id,
-            providerId: account.provider,
-          },
-        })
-        idToken = newIdToken
+        console.log({ err, xd: "xd" })
+
+        // const { idToken: newIdToken } = await auth.api.refreshToken({
+        //   headers: await headers(),
+        //   body: {
+        //     accountId: account.id,
+        //     providerId: account.provider,
+        //   },
+        // })
+        // idToken = newIdToken
       }
 
       const decodedIdToken: IdTokenType = await jwtDecode(idToken!)

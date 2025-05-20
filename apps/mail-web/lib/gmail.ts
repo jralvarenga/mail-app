@@ -1,7 +1,7 @@
 import { EmailMessageType } from "@budio/zod/types"
 
 const GMAIL_API = "https://gmail.googleapis.com/gmail/v1"
-const EMAIL_COUNT = "20"
+const EMAIL_COUNT = "6"
 
 function decodeBase64(data: string): string {
   return Buffer.from(
@@ -29,7 +29,7 @@ async function listMessageIds(
   const url = new URL(`${GMAIL_API}/users/${userId}/messages`)
   url.searchParams.append("maxResults", EMAIL_COUNT)
   url.searchParams.append("labelIds", "INBOX")
-  url.searchParams.append("q", "is:important")
+  url.searchParams.append("q", "-category:promotions -category:social")
   if (pageToken) url.searchParams.set("pageToken", pageToken)
 
   const response = await fetch(url.toString(), {

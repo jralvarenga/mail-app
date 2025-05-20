@@ -5,7 +5,8 @@
   "exports": {
     "./helpers/*": "./src/helpers/*.ts",
     "./hooks/*": "./src/hooks/*.tsx",
-    "./providers/*": "./src/providers/*.tsx"
+    "./providers/*": "./src/providers/*.tsx",
+    "./dayjs": "./src/dayjs/index.ts"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",
@@ -24,6 +25,7 @@
   "dependencies": {
     "@budio/auth": "workspace:*",
     "@budio/zod": "workspace:*",
+    "dayjs": "^1.11.13",
     "jotai": "^2.12.2",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"

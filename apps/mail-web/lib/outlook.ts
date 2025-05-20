@@ -29,14 +29,16 @@ async function listFocusedMessages(
   accessToken: string,
   pageToken?: string,
 ): Promise<{ messages: any[]; nextPageToken: string }> {
-  const url = new URL(pageToken ? pageToken : `${GRAPH_API}/me/messages`)
+  const url = new URL(
+    pageToken ? pageToken : `${GRAPH_API}/me/mailFolders/inbox/messages`,
+  )
   if (!pageToken) {
     url.searchParams.append("$top", EMAIL_COUNT)
-    url.searchParams.append("$filter", "inferenceClassification eq 'focused'")
     url.searchParams.append(
       "$select",
-      "id,subject,from,toRecipients,conversationId,isRead,bodyPreview,receivedDateTime",
+      "id,subject,from,toRecipients,conversationId,isRead,bodyPreview,receivedDateTime,inferenceClassification",
     )
+    url.searchParams.append("$orderby", "receivedDateTime desc") // ✅ Sort newest first
   }
 
   const response = await fetch(url.toString(), {
