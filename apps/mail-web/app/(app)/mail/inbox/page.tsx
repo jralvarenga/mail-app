@@ -1,12 +1,13 @@
 "use client"
 
-import { fetchGmailInbox } from "@/lib/gmail"
-import { fetchOutlookInbox } from "@/lib/outlook"
 import { authClient } from "@budio/auth/client"
 import { useAccounts } from "@budio/lib/hooks/use-accounts"
+import { fetchGmailInbox } from "@budio/lib/mail/gmail"
+import { fetchOutlookInbox } from "@budio/lib/mail/outlook"
 import { MailInbox } from "@budio/web-ui/components/mail-inbox"
 import { useInfiniteQuery } from "@tanstack/react-query"
 import { useEffect, useMemo } from "react"
+import { localDb } from "@budio/drizzle/local"
 
 export default function MailPage() {
   const { data: sessionData } = authClient.useSession()
@@ -72,6 +73,10 @@ export default function MailPage() {
       fetchNextPage()
     }
   }, [messages])
+
+  // useEffect(() => {
+  //   const xd = localDb.query.messagesTable.findMany()
+  // }, [messages])
 
   return (
     <div className="flex">

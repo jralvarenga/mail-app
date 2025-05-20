@@ -45,14 +45,15 @@ export default async function AppLayout({
         idToken = await getIdToken(account.id, account.provider)
       } catch (err: any) {
         console.log({ err, xd: "xd" })
+        console.log(err.body)
 
-        // const { idToken: newIdToken } = await auth.api.refreshToken({
-        //   headers: await headers(),
-        //   body: {
-        //     accountId: account.id,
-        //     providerId: account.provider,
-        //   },
-        // })
+        const { idToken: newIdToken } = await auth.api.refreshToken({
+          headers: await headers(),
+          body: {
+            accountId: account.id,
+            providerId: account.provider,
+          },
+        })
         // idToken = newIdToken
       }
 

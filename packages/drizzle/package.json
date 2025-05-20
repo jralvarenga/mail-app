@@ -4,9 +4,11 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "push": "npx drizzle-kit push"
+    "push": "npx drizzle-kit push",
+    "push:local": "npx drizzle-kit push --config=drizzle.local.config.ts"
   },
   "dependencies": {
+    "@electric-sql/pglite": "^0.3.1",
     "@neondatabase/serverless": "^1.0.0",
     "dotenv": "^16.5.0",
     "drizzle-orm": "^0.43.1",
@@ -20,6 +22,8 @@
   },
   "exports": {
     "./db": "./src/index.ts",
-    "./schema": "./src/schema.ts"
+    "./local": "./src/local.ts",
+    "./schema": "./src/schema.ts",
+    "./local-schema": "./src/local-schema.ts"
   }
 }

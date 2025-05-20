@@ -4,6 +4,7 @@
   "private": true,
   "exports": {
     "./helpers/*": "./src/helpers/*.ts",
+    "./mail/*": "./src/mail/*.ts",
     "./hooks/*": "./src/hooks/*.tsx",
     "./providers/*": "./src/providers/*.tsx",
     "./dayjs": "./src/dayjs/index.ts"
