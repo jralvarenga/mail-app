@@ -93,6 +93,8 @@ export async function fetchOutlookInbox(
   const allMessages: EmailMessageType[] = []
 
   for (const msg of messages) {
+    console.log(msg)
+
     // const convId = msg.conversationId
     // if (seenConversations.has(convId)) continue
 

@@ -30,9 +30,8 @@ export function MailInbox({ messages }: Props) {
                 {message.from.split(" <")[0]}
               </TableCell>
               <TableCell className="min-w-[200px] max-w-[400px] truncate py-1">
-                <span className="font-medium">{message.subject}</span>
-                {" - "}
-                <span className="text-muted-foreground">{message.body}</span>
+                <span className="font-medium">{message.subject}</span>{" "}
+                <span className="text-muted-foreground">{message.snippet}</span>
               </TableCell>
               <TableCell className="text-right">
                 {dayjs(message.date).fromNow()}

@@ -44,13 +44,13 @@ export function BudioLayoutWrapper({
       defaultCollapsed={defaultCollapsed}
       accounts={state.accounts}
       switchAccount={onAccountChange}
+      redirect={(href) => router.push(href)}
       selectedAccountEmail={state.selectedAccount?.email || ""}
       logout={async () => {
         authClient.signOut({
           fetchOptions: { onSuccess: () => router.push("/login") },
         })
       }}
-      linkGoogleAccount={async () => {}}
       user={data?.user}
     >
       {children}

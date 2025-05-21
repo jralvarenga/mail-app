@@ -64,6 +64,8 @@ async function getMessage(
   }
 
   const msg = await response.json()
+  console.log(msg)
+
   const headers = msg.payload.headers
   const get = (name: string) =>
     headers.find((h: any) => h.name.toLowerCase() === name.toLowerCase())
@@ -72,6 +74,7 @@ async function getMessage(
   return {
     id: msg.id,
     threadId: msg.threadId,
+    preview: msg.snippet,
     from: get("From"),
     to: get("To"),
     subject: get("Subject"),

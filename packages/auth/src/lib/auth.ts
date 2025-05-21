@@ -19,9 +19,9 @@ export const auth = betterAuth({
   plugins: [nextCookies()],
   socialProviders: {
     google: {
-      prompt: "select_account",
       clientId: process.env.GOOGLE_CLIENT_ID as string,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+      accessType: "offline",
       scope: [
         "https://www.googleapis.com/auth/gmail.modify", // gmail (read, write, delete)
       ],
@@ -30,6 +30,7 @@ export const auth = betterAuth({
       prompt: "select_account",
       clientId: process.env.MICROSOFT_CLIENT_ID as string,
       clientSecret: process.env.MICROSOFT_CLIENT_SECRET as string,
+
       scope: ["Mail.Read", "Mail.Send", "offline_access"],
     },
   },

@@ -16,9 +16,10 @@ import {
 interface Props {
   user?: { email: string; name: string; image?: string | null }
   logout: () => Promise<void>
+  redirect: (href: string) => void
 }
 
-export function UserButton({ user, logout }: Props) {
+export function UserButton({ user, logout, redirect }: Props) {
   if (!user) {
     return <></>
   }
@@ -44,9 +45,9 @@ export function UserButton({ user, logout }: Props) {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem>
-            Profile
-            <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
+          <DropdownMenuItem onClick={() => redirect("/account")}>
+            Account
+            <DropdownMenuShortcut>⇧⌘A</DropdownMenuShortcut>
           </DropdownMenuItem>
           <DropdownMenuItem>
             Billing

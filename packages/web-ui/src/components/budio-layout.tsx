@@ -32,9 +32,10 @@ interface Props {
   selectedAccountEmail: string
   switchAccount: (email: string) => void
 
+  redirect: (href: string) => void
+
   user?: { email: string; name: string; image?: string | null }
   logout: () => Promise<void>
-  linkGoogleAccount: () => Promise<void>
 }
 
 export function BudioLayout({
@@ -46,6 +47,7 @@ export function BudioLayout({
   switchAccount,
   logout,
   user,
+  redirect,
 }: Props) {
   const [isCollapsed, setIsCollapsed] = useState(defaultCollapsed)
 
@@ -90,7 +92,7 @@ export function BudioLayout({
               isCollapsed ? "h-[52px]" : "",
             )}
           >
-            <UserButton logout={logout} user={user} />
+            <UserButton logout={logout} user={user} redirect={redirect} />
           </div>
           <div
             className={cn(
