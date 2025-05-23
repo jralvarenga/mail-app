@@ -5,6 +5,7 @@ import { BudioLayout } from "@budio/web-ui/components/budio-layout"
 import { AccountSwitcherAccountType } from "@budio/zod/types"
 import { useRouter } from "next/navigation"
 import { useAccounts } from "@budio/lib/hooks/use-accounts"
+import { useMail } from "@budio/lib/hooks/use-mail"
 import { useEffect } from "react"
 
 interface Props {
@@ -20,7 +21,7 @@ export function BudioLayoutWrapper({
   defaultCollapsed,
   defaultLayout,
 }: Props) {
-  const { updateState, changeSelectedAccount, state } = useAccounts()
+  const { updateState, changeSelectedAccount, state } = useMail()
   const { data } = authClient.useSession()
   const router = useRouter()
 
@@ -35,6 +36,8 @@ export function BudioLayoutWrapper({
     updateState({
       accounts,
       selectedAccount: accounts[0]!,
+      selectedMessages: null,
+      messages: [],
     })
   }, [accounts])
 

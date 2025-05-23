@@ -1,7 +1,74 @@
-import { EmailMessageType } from "@budio/zod/types"
+import {
+  EmailMessageType,
+  GmailMessageResponseType,
+  GmailMessagesResponseType,
+  GmailThreadResponseType,
+} from "@budio/zod/types"
 
 const GMAIL_API = "https://gmail.googleapis.com/gmail/v1"
-const EMAIL_COUNT = "6"
+const EMAIL_COUNT = "20"
+
+type MimeType = "text/plain" | "text/html"
+
+interface UnifiedMessageBody {
+  type: MimeType // 'text/html' if any part is HTML, else 'text/plain'
+  html: string | null // All parts joined together
+  text: string | null // Only the plain text parts joined together
+}
+
+/**
+ * Decode base64url Gmail message data.
+ */
+function decodeBase64url(data?: string): string {
+  if (!data) return ""
+  const fixed = data.replace(/-/g, "+").replace(/_/g, "/")
+  const padded = fixed + "=".repeat((4 - (fixed.length % 4)) % 4)
+  return decodeURIComponent(escape(window.atob(padded)))
+}
+
+/**
+ * Recursively collects parts of Gmail message payload.
+ */
+export function getUnifiedMessageBody(payload: any): UnifiedMessageBody {
+  const allParts: string[] = []
+  const htmlParts: string[] = []
+  const textParts: string[] = []
+
+  function walk(part: any) {
+    if (part.parts) {
+      part.parts.forEach(walk)
+    } else if (part.body?.data) {
+      const content = decodeBase64url(part.body.data)
+      allParts.push(content)
+      if (part.mimeType === "text/html") {
+        htmlParts.push(content)
+      }
+      if (part.mimeType === "text/plain") {
+        textParts.push(content)
+      }
+    }
+  }
+
+  walk(payload)
+
+  // Fallback for top-level body
+  if (allParts.length === 0 && payload.body?.data) {
+    const content = decodeBase64url(payload.body.data)
+    allParts.push(content)
+    if (payload.mimeType === "text/html") {
+      htmlParts.push(content)
+    }
+    if (payload.mimeType === "text/plain") {
+      textParts.push(content)
+    }
+  }
+
+  return {
+    type: htmlParts.length > 0 ? "text/html" : "text/plain",
+    html: htmlParts.length > 0 ? htmlParts.join("\n") : null,
+    text: textParts.length > 0 ? textParts.join("\n") : null,
+  }
+}
 
 function decodeBase64(data: string): string {
   return Buffer.from(
@@ -40,7 +107,7 @@ async function listMessageIds(
     throw new Error(`Failed to fetch messages: ${response.statusText}`)
   }
 
-  const data = await response.json()
+  const data = (await response.json()) as GmailMessagesResponseType
   return {
     messages: data.messages?.map((msg: any) => msg.id) || [],
     nextPageToken: data.nextPageToken || "",
@@ -63,25 +130,24 @@ async function getMessage(
     throw new Error(`Failed to fetch message: ${response.statusText}`)
   }
 
-  const msg = await response.json()
-  console.log(msg)
-
+  const msg = (await response.json()) as GmailMessageResponseType
   const headers = msg.payload.headers
   const get = (name: string) =>
     headers.find((h: any) => h.name.toLowerCase() === name.toLowerCase())
       ?.value || ""
+  const unifiedBody = getUnifiedMessageBody(msg.payload)
 
   return {
     id: msg.id,
     threadId: msg.threadId,
-    preview: msg.snippet,
     from: get("From"),
     to: get("To"),
     subject: get("Subject"),
     date: get("Date"),
-    body: extractPlainText(msg.payload),
+    body: unifiedBody.html ? unifiedBody.html : unifiedBody.text!,
     snippet: msg.snippet,
     isRead: !msg.labelIds?.includes("UNREAD"),
+    type: unifiedBody.type,
   }
 }
 
@@ -101,7 +167,7 @@ async function getThreadMessages(
     throw new Error(`Failed to fetch thread: ${response.statusText}`)
   }
 
-  const data = await response.json()
+  const data = (await response.json()) as GmailThreadResponseType
   return data.messages.map((msg: any) => {
     const headers = msg.payload.headers
     const get = (name: string) =>
@@ -117,6 +183,9 @@ async function getThreadMessages(
       date: get("Date"),
       body: extractPlainText(msg.payload),
       snippet: msg.snippet,
+      fullBody: "",
+      isRead: true,
+      type: "text/html",
     }
   })
 }
@@ -129,21 +198,10 @@ export async function fetchGmailInbox(
 ): Promise<{ messages: EmailMessageType[]; nextPageToken: string }> {
   const { messages: messageIds, nextPageToken: newPageToken } =
     await listMessageIds(accessToken, userId, nextPageToken)
-  // const seenThreads = new Set<string>()
   const messages: EmailMessageType[] = []
 
   for (const messageId of messageIds) {
     const email = await getMessage(accessToken, messageId, userId)
-
-    // Skip if we've already processed this thread
-    // if (seenThreads.has(email.threadId)) continue
-
-    // // Get all messages in this thread
-    // const threadMessages = await getThreadMessages(
-    //   accessToken,
-    //   email.threadId,
-    //   userId,
-    // )
     messages.push(email)
   }
 

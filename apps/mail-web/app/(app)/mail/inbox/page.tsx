@@ -1,17 +1,18 @@
 "use client"
 
 import { authClient } from "@budio/auth/client"
-import { useAccounts } from "@budio/lib/hooks/use-accounts"
 import { fetchGmailInbox } from "@budio/lib/mail/gmail"
 import { fetchOutlookInbox } from "@budio/lib/mail/outlook"
 import { MailInbox } from "@budio/web-ui/components/mail-inbox"
+import { MessageContainer } from "@budio/web-ui/components/message-container"
 import { useInfiniteQuery } from "@tanstack/react-query"
 import { useEffect, useMemo } from "react"
-import { localDb } from "@budio/drizzle/local"
+import { useMail } from "@budio/lib/hooks/use-mail"
+import { EmailMessageType } from "@budio/zod/types"
 
 export default function MailPage() {
   const { data: sessionData } = authClient.useSession()
-  const { state } = useAccounts()
+  const { state, setSelectedMessages } = useMail()
   const { data, refetch, isLoading, fetchNextPage } = useInfiniteQuery({
     queryKey: ["email-inbox", state.selectedAccount?.email],
     queryFn: async ({ pageParam }) => {
@@ -78,15 +79,31 @@ export default function MailPage() {
   //   const xd = localDb.query.messagesTable.findMany()
   // }, [messages])
 
+  function onMessageClick(message: EmailMessageType) {
+    setSelectedMessages([message])
+  }
+
   return (
-    <div className="flex">
-      <div className="flex-1 p-5">
+    <div className="flex h-screen">
+      <div className="h-full flex-1 overflow-y-auto p-5">
         <div className="flex items-center">
           <h3>Inbox</h3>
         </div>
-        <MailInbox messages={messages} />
+        <MailInbox
+          messages={messages}
+          onMessageClick={onMessageClick}
+          hideFields={
+            !!state.selectedMessages && state.selectedMessages?.length > 0
+          }
+        />
       </div>
-      {/* {children} */}
+
+      {state.selectedMessages && state.selectedMessages?.length > 0 && (
+        <MessageContainer
+          messages={state.selectedMessages}
+          selectedAccount={state.selectedAccount!}
+        />
+      )}
     </div>
   )
 }

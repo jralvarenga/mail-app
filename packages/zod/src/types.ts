@@ -20,3 +20,21 @@ export type AccountSwitcherAccountType = z.infer<
   typeof ZodUtils.AccountSwitcherAccountSchema
 >
 export type AccountStateType = z.infer<typeof ZodUtils.AccountStateSchema>
+export type MailStateType = z.infer<typeof ZodUtils.MailStateSchema>
+
+/**
+ * Gmail types
+ */
+export type GmailHeaderType = z.infer<typeof ZodUtils.GmailHeaderSchema>
+export type GmailMessagePayloadType = z.infer<
+  typeof ZodUtils.GmailMessagePayloadSchema
+>
+export type GmailMessageResponseType = z.infer<
+  typeof ZodUtils.GmailMessageResponseSchema
+>
+export type GmailMessagesResponseType = z.infer<
+  typeof ZodUtils.GmailMessagesResponseSchema
+>
+export type GmailThreadResponseType = z.infer<
+  typeof ZodUtils.GmailThreadResponseSchema
+>

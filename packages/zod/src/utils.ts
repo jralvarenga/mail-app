@@ -59,6 +59,7 @@ export const EmailMessageSchema = z.object({
   subject: z.string(),
   date: z.string(),
   body: z.string(),
+  type: z.enum(["text/html", "text/plain"]),
   snippet: z.string(),
   isRead: z.boolean(),
 })
@@ -94,4 +95,66 @@ export const AccountSwitcherAccountSchema = z.object({
 export const AccountStateSchema = z.object({
   accounts: z.array(AccountSwitcherAccountSchema),
   selectedAccount: AccountSwitcherAccountSchema.nullable(),
+})
+
+export const MailStateSchema = z.object({
+  accounts: AccountSwitcherAccountSchema.array(),
+  selectedAccount: AccountSwitcherAccountSchema.nullable(),
+  messages: EmailMessageSchema.array(),
+  selectedMessages: EmailMessageSchema.array().nullable(),
+  mailType: z.enum(["inbox", "sent", "drafts", "trash", "spam", "starred"]),
+})
+
+/**
+ * Gmail schemas
+ */
+export const GmailHeaderSchema = z.object({
+  name: z.string(),
+  value: z.string(),
+})
+
+export const GmailBodySchema = z.object({
+  size: z.number(),
+  data: z.string().optional(), // base64url encoded
+  attachmentId: z.string().optional(),
+})
+
+export const GmailMessagePayloadSchema: z.ZodType<any> = z.lazy(() =>
+  z.object({
+    partId: z.string().optional(),
+    mimeType: z.string(),
+    filename: z.string(),
+    headers: z.array(GmailHeaderSchema),
+    body: GmailBodySchema,
+    parts: z.array(GmailMessagePayloadSchema).optional(),
+  }),
+)
+
+export const GmailMessageResponseSchema = z.object({
+  id: z.string(),
+  threadId: z.string(),
+  labelIds: z.array(z.string()).optional(),
+  snippet: z.string(),
+  historyId: z.string().optional(),
+  internalDate: z.string(), // ms timestamp
+  payload: GmailMessagePayloadSchema.optional(),
+  sizeEstimate: z.number().optional(),
+  raw: z.string().optional(),
+})
+
+export const GmailMessagesResponseSchema = z.object({
+  messages: z.array(
+    z.object({
+      id: z.string(),
+      threadId: z.string(),
+    }),
+  ),
+  nextPageToken: z.string().optional(),
+  resultSizeEstimate: z.number(),
+})
+
+export const GmailThreadResponseSchema = z.object({
+  id: z.string(),
+  historyId: z.string(),
+  messages: z.array(GmailMessageResponseSchema),
 })

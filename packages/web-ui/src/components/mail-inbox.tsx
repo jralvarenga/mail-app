@@ -4,9 +4,15 @@ import dayjs from "@budio/lib/dayjs"
 
 interface Props {
   messages: EmailMessageType[]
+  hideFields?: boolean
+  onMessageClick: (message: EmailMessageType) => void
 }
 
-export function MailInbox({ messages }: Props) {
+export function MailInbox({
+  messages,
+  onMessageClick,
+  hideFields = false,
+}: Props) {
   // const toggleRead = (id: string) => {
   //   setMessages(messages.map((message) => (message.id === id ? { ...message, read: !message.read } : message)))
 
@@ -18,7 +24,7 @@ export function MailInbox({ messages }: Props) {
             <TableRow
               key={message.id}
               className="hover:bg-muted/50 cursor-pointer"
-              // onClick={() => toggleRead(message.id)}
+              onClick={() => onMessageClick(message)}
             >
               <TableCell>
                 <div
@@ -26,16 +32,26 @@ export function MailInbox({ messages }: Props) {
                   aria-label={message.isRead ? "Read" : "Unread"}
                 />
               </TableCell>
-              <TableCell className="min-w-[70px] max-w-[100px] truncate py-1">
-                {message.from.split(" <")[0]}
+              <TableCell className="min-w-[70px] max-w-[100px] py-1">
+                <div className="w-full truncate">
+                  {message.from.split(" <")[0]}
+                </div>
               </TableCell>
-              <TableCell className="min-w-[200px] max-w-[400px] truncate py-1">
-                <span className="font-medium">{message.subject}</span>{" "}
-                <span className="text-muted-foreground">{message.snippet}</span>
+              <TableCell className="min-w-[200px] max-w-[400px] py-1">
+                <div className="w-full truncate">
+                  <span className="font-medium">{message.subject}</span>{" "}
+                  {!hideFields && (
+                    <span className="text-muted-foreground">
+                      {message.snippet}
+                    </span>
+                  )}
+                </div>
               </TableCell>
-              <TableCell className="text-right">
-                {dayjs(message.date).fromNow()}
-              </TableCell>
+              {!hideFields && (
+                <TableCell className="text-right">
+                  {dayjs(message.date).fromNow()}
+                </TableCell>
+              )}
             </TableRow>
           ))}
         </TableBody>

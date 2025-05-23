@@ -11,17 +11,35 @@ function parseDate(dateString: string): string {
   return new Date(dateString).toUTCString()
 }
 
-function parseMessage(msg: any): EmailMessageType {
+async function getMessage(
+  msg: any,
+  accessToken: string,
+): Promise<EmailMessageType> {
+  const res = await fetch(
+    `https://graph.microsoft.com/v1.0/me/messages/${msg.id}`,
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    },
+  )
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch full email")
+  }
+
+  const data = await res.json()
+
   return {
-    id: msg.id,
-    threadId: msg.conversationId,
+    id: data.id,
+    threadId: data.conversationId,
     from: parseAddress(msg.from),
     to: msg.toRecipients?.map(parseAddress).join(", "),
-    subject: msg.subject,
-    date: parseDate(msg.receivedDateTime),
-    body: msg.bodyPreview,
-    snippet: msg.bodyPreview,
-    isRead: msg.isRead,
+    subject: data.subject,
+    date: parseDate(data.receivedDateTime),
+    body: data.body.content,
+    snippet: data.bodyPreview,
+    isRead: data.isRead,
   }
 }
 
@@ -78,7 +96,9 @@ async function getConversationMessages(
   }
 
   const data = await response.json()
-  return data.value.map((msg: any): EmailMessageType => parseMessage(msg))
+  return data.value.map(
+    async (msg: any): Promise<EmailMessageType> => getMessage(msg, ""),
+  )
 }
 
 export async function fetchOutlookInbox(
@@ -93,15 +113,8 @@ export async function fetchOutlookInbox(
   const allMessages: EmailMessageType[] = []
 
   for (const msg of messages) {
-    console.log(msg)
-
-    // const convId = msg.conversationId
-    // if (seenConversations.has(convId)) continue
-
-    // const threadMessages = await getConversationMessages(accessToken, convId)
-    // allMessages.push(...threadMessages)
-    // seenConversations.add(convId)
-    allMessages.push(parseMessage(msg))
+    const parsedMessage = await getMessage(msg, accessToken)
+    allMessages.push(parsedMessage)
   }
 
   return {
