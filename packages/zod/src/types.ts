@@ -16,9 +16,7 @@ export type ThreadedChatParticipantType = z.infer<
   typeof ZodUtils.ThreadedChatParticipantSchema
 >
 
-export type AccountSwitcherAccountType = z.infer<
-  typeof ZodUtils.AccountSwitcherAccountSchema
->
+export type LinkedAccountType = z.infer<typeof ZodUtils.LinkedAccountSchema>
 export type AccountStateType = z.infer<typeof ZodUtils.AccountStateSchema>
 export type MailStateType = z.infer<typeof ZodUtils.MailStateSchema>
 

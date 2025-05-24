@@ -28,7 +28,6 @@ export const mailRouter = createTRPCRouter({
       if (input.provider === "google") {
         const { messages, nextPageToken: gmailNextPageToken } =
           await fetchGmailInboxPage(input.accessToken, input.userId)
-        console.log(messages)
 
         inbox = messages
         nextPageToken = gmailNextPageToken

@@ -1,4 +1,4 @@
-import { AccountSwitcherAccountType, EmailMessageType } from "@budio/zod/types"
+import { LinkedAccountType, EmailMessageType } from "@budio/zod/types"
 import DOMPurify from "dompurify"
 import { cn } from "../lib/utils"
 import { useState } from "react"
@@ -6,7 +6,7 @@ import { Button } from "./ui/button"
 
 interface Props {
   messages: EmailMessageType[]
-  selectedAccount: AccountSwitcherAccountType
+  selectedAccount: LinkedAccountType
 }
 
 export function MessageContainer({ messages, selectedAccount }: Props) {
@@ -27,7 +27,6 @@ export function MessageContainer({ messages, selectedAccount }: Props) {
       .replace(/&nbsp;/g, " ")
       .replace(/&#39;/g, "'")
   }
-  console.log(messages)
 
   return (
     <div className="max-w-1/2 relative flex h-full flex-1 flex-col gap-3">
@@ -37,20 +36,19 @@ export function MessageContainer({ messages, selectedAccount }: Props) {
           Toggle sanitize
         </Button>
       </div>
-      <div className="overflow-y-auto px-4 pb-20 pt-20">
+      <div className="flex flex-col gap-3 overflow-y-auto px-4 pb-20 pt-20">
         {messages.map((message) => (
           <div
+            key={message.id}
             className={cn(
               "flex",
-              message.from === selectedAccount.email
+              message.from.split("<")[1]?.replaceAll(">", "") ===
+                selectedAccount.email
                 ? "justify-end"
                 : "justify-start",
             )}
           >
-            <div
-              className="bg-muted max-w-11/12 flex flex-col gap-2 rounded-lg p-2"
-              key={message.id}
-            >
+            <div className="bg-muted max-w-11/12 flex flex-col gap-2 rounded-lg p-2">
               <div>
                 <div className={`overflow-auto`}>
                   {message.type === "text/html" ? (

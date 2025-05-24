@@ -84,23 +84,22 @@ export const ThreadedChatParticipantSchema = ChatParticipantSchema.omit({
   messages: z.array(ThreadedMessageSchema),
 })
 
-export const AccountSwitcherAccountSchema = z.object({
+export const LinkedAccountSchema = z.object({
   id: z.string(),
   accountId: z.string(),
   email: z.string(),
   name: z.string(),
   provider: z.string(),
-  icon: z.any(),
 })
 
 export const AccountStateSchema = z.object({
-  accounts: z.array(AccountSwitcherAccountSchema),
-  selectedAccount: AccountSwitcherAccountSchema.nullable(),
+  accounts: z.array(LinkedAccountSchema),
+  selectedAccount: LinkedAccountSchema.nullable(),
 })
 
 export const MailStateSchema = z.object({
-  accounts: AccountSwitcherAccountSchema.array(),
-  selectedAccount: AccountSwitcherAccountSchema.nullable(),
+  accounts: LinkedAccountSchema.array(),
+  selectedAccount: LinkedAccountSchema.nullable(),
   messages: EmailMessageSchema.array(),
   selectedMessages: EmailMessageSchema.array().nullable(),
   mailType: z.enum(["inbox", "sent", "drafts", "trash", "spam", "starred"]),

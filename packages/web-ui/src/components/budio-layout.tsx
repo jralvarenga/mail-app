@@ -4,7 +4,7 @@ import { ReactNode, useState } from "react"
 import { TooltipProvider } from "./ui/tooltip"
 import { cn } from "../lib/utils"
 import { BudioNav } from "./budio-nav"
-import { AccountSwitcherAccountType } from "@budio/zod/types"
+import { LinkedAccountType } from "@budio/zod/types"
 import {
   Archive,
   ArchiveX,
@@ -28,7 +28,7 @@ interface Props {
   children: ReactNode
   defaultCollapsed?: boolean
   defaultLayout?: number[]
-  accounts: AccountSwitcherAccountType[]
+  accounts: LinkedAccountType[]
   selectedAccountEmail: string
   switchAccount: (email: string) => void
 

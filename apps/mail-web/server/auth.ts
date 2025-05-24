@@ -1,10 +1,9 @@
 "use server"
 
 import { auth } from "@budio/auth"
-import { AccountSwitcherAccountType, IdTokenType } from "@budio/zod/types"
+import { LinkedAccountType, IdTokenType } from "@budio/zod/types"
 import { jwtDecode } from "jwt-decode"
 import { headers } from "next/headers"
-import { Icons } from "@budio/web-ui/components/icons"
 
 async function getIdToken(id: string, provider: string) {
   const { idToken } = await auth.api.getAccessToken({
@@ -22,6 +21,10 @@ export async function getLinkedAccounts() {
     headers: await headers(),
   })
 
+  if (!linkedAccounts || linkedAccounts.length === 0) {
+    return []
+  }
+
   return Promise.all(
     linkedAccounts.map(async (account) => {
       const idToken = await getIdToken(account.id, account.provider)
@@ -34,9 +37,7 @@ export async function getLinkedAccounts() {
         email: decodedIdToken.email,
         name: decodedIdToken.name,
         provider: account.provider,
-        // TODO: fix icons
-        icon: account.provider === "google" ? Icons.gmail : Icons.outlook,
-      } satisfies AccountSwitcherAccountType
+      } satisfies LinkedAccountType
     }),
   )
 }

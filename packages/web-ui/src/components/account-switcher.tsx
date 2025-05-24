@@ -10,11 +10,11 @@ import {
   SelectValue,
 } from "./ui/select"
 import { cn } from "../lib/utils"
-import { AccountSwitcherAccountType } from "@budio/zod/types"
+import { LinkedAccountType } from "@budio/zod/types"
 
 interface AccountSwitcherProps {
   isCollapsed: boolean
-  accounts: AccountSwitcherAccountType[]
+  accounts: LinkedAccountType[]
   selectedAccount: string
   switchAccount: (email: string) => void
 }
