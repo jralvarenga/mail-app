@@ -62,6 +62,7 @@ export const EmailMessageSchema = z.object({
   type: z.enum(["text/html", "text/plain"]),
   snippet: z.string(),
   isRead: z.boolean(),
+  accountId: z.string(),
 })
 
 export const ChatParticipantSchema = z.object({
@@ -147,6 +148,18 @@ export const GmailMessagesResponseSchema = z.object({
     z.object({
       id: z.string(),
       threadId: z.string(),
+    }),
+  ),
+  nextPageToken: z.string().optional(),
+  resultSizeEstimate: z.number(),
+})
+
+export const GmailThreadsResponseSchema = z.object({
+  threads: z.array(
+    z.object({
+      historyId: z.string(),
+      id: z.string(),
+      snippet: z.string(),
     }),
   ),
   nextPageToken: z.string().optional(),

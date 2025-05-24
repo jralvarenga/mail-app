@@ -14,6 +14,7 @@ function parseDate(dateString: string): string {
 async function getMessage(
   msg: any,
   accessToken: string,
+  userId: string,
 ): Promise<EmailMessageType> {
   const res = await fetch(
     `https://graph.microsoft.com/v1.0/me/messages/${msg.id}`,
@@ -40,6 +41,8 @@ async function getMessage(
     body: data.body.content,
     snippet: data.bodyPreview,
     isRead: data.isRead,
+    accountId: userId,
+    type: "text/html",
   }
 }
 
@@ -97,12 +100,13 @@ async function getConversationMessages(
 
   const data = await response.json()
   return data.value.map(
-    async (msg: any): Promise<EmailMessageType> => getMessage(msg, ""),
+    async (msg: any): Promise<EmailMessageType> => getMessage(msg, "", ""),
   )
 }
 
 export async function fetchOutlookInbox(
   accessToken: string,
+  userId: string,
   pageToken?: string,
 ): Promise<{ messages: EmailMessageType[]; nextPageToken: string }> {
   const { messages, nextPageToken } = await listFocusedMessages(
@@ -113,7 +117,7 @@ export async function fetchOutlookInbox(
   const allMessages: EmailMessageType[] = []
 
   for (const msg of messages) {
-    const parsedMessage = await getMessage(msg, accessToken)
+    const parsedMessage = await getMessage(msg, accessToken, userId)
     allMessages.push(parsedMessage)
   }
 

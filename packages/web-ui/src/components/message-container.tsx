@@ -30,7 +30,7 @@ export function MessageContainer({ messages, selectedAccount }: Props) {
   console.log(messages)
 
   return (
-    <div className="relative flex h-full flex-1 flex-col gap-3">
+    <div className="max-w-1/2 relative flex h-full flex-1 flex-col gap-3">
       <div className="bg-background/50 absolute top-0 z-50 h-16 w-full backdrop-blur-lg">
         Messages
         <Button onClick={() => setOnlyShowText(!onlyShowText)}>

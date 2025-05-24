@@ -1,7 +1,7 @@
 "use client"
 
 import { authClient } from "@budio/auth/client"
-import { fetchGmailInbox } from "@budio/lib/mail/gmail"
+import { fetchGmailInbox, getThreadMessages } from "@budio/lib/mail/gmail"
 import { fetchOutlookInbox } from "@budio/lib/mail/outlook"
 import { MailInbox } from "@budio/web-ui/components/mail-inbox"
 import { MessageContainer } from "@budio/web-ui/components/message-container"
@@ -37,6 +37,7 @@ export default function MailPage() {
       if (state.selectedAccount?.provider === "microsoft") {
         const { messages, nextPageToken } = await fetchOutlookInbox(
           accessToken.data!.accessToken!,
+          state.selectedAccount?.accountId!,
           pageParam,
         )
 
@@ -79,8 +80,19 @@ export default function MailPage() {
   //   const xd = localDb.query.messagesTable.findMany()
   // }, [messages])
 
-  function onMessageClick(message: EmailMessageType) {
-    setSelectedMessages([message])
+  async function onMessageClick(message: EmailMessageType) {
+    const accessToken = await authClient.getAccessToken({
+      providerId: state.selectedAccount!.provider,
+      accountId: state.selectedAccount?.id,
+      userId: sessionData?.user.id,
+    })
+    const threadMessages = await getThreadMessages({
+      accessToken: accessToken.data!.accessToken!,
+      threadId: message.threadId,
+      userId: state.selectedAccount?.accountId!,
+    })
+
+    setSelectedMessages(threadMessages)
   }
 
   return (

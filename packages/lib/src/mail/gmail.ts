@@ -3,6 +3,7 @@ import {
   GmailMessageResponseType,
   GmailMessagesResponseType,
   GmailThreadResponseType,
+  GmailThreadsResponseType,
 } from "@budio/zod/types"
 
 const GMAIL_API = "https://gmail.googleapis.com/gmail/v1"
@@ -114,11 +115,41 @@ async function listMessageIds(
   }
 }
 
-async function getMessage(
+async function listThreadsIds(
   accessToken: string,
-  messageId: string,
   userId: string,
-): Promise<EmailMessageType> {
+  pageToken?: string,
+): Promise<{ messages: string[]; nextPageToken: string }> {
+  const url = new URL(`${GMAIL_API}/users/${userId}/threads`)
+  url.searchParams.append("maxResults", EMAIL_COUNT)
+  url.searchParams.append("labelIds", "INBOX")
+  url.searchParams.append("q", "-category:promotions -category:social")
+  if (pageToken) url.searchParams.set("pageToken", pageToken)
+
+  const response = await fetch(url.toString(), {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  })
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch messages: ${response.statusText}`)
+  }
+
+  const data = (await response.json()) as GmailThreadsResponseType
+  return {
+    messages: data.threads?.map((msg: any) => msg.id) || [],
+    nextPageToken: data.nextPageToken || "",
+  }
+}
+
+async function getMessage({
+  accessToken,
+  messageId,
+  userId,
+}: {
+  accessToken: string
+  messageId: string
+  userId: string
+}): Promise<EmailMessageType> {
   const url = new URL(`${GMAIL_API}/users/${userId}/messages/${messageId}`)
   url.searchParams.append("format", "full")
 
@@ -148,14 +179,19 @@ async function getMessage(
     snippet: msg.snippet,
     isRead: !msg.labelIds?.includes("UNREAD"),
     type: unifiedBody.type,
+    accountId: userId,
   }
 }
 
-async function getThreadMessages(
-  accessToken: string,
-  threadId: string,
-  userId: string,
-): Promise<EmailMessageType[]> {
+export async function getThreadMessages({
+  accessToken,
+  threadId,
+  userId,
+}: {
+  accessToken: string
+  threadId: string
+  userId: string
+}): Promise<EmailMessageType[]> {
   const url = new URL(`${GMAIL_API}/users/${userId}/threads/${threadId}`)
   url.searchParams.append("format", "full")
 
@@ -173,6 +209,7 @@ async function getThreadMessages(
     const get = (name: string) =>
       headers.find((h: any) => h.name.toLowerCase() === name.toLowerCase())
         ?.value || ""
+    const unifiedBody = getUnifiedMessageBody(msg.payload)
 
     return {
       id: msg.id,
@@ -181,11 +218,11 @@ async function getThreadMessages(
       to: get("To"),
       subject: get("Subject"),
       date: get("Date"),
-      body: extractPlainText(msg.payload),
+      body: unifiedBody.html ? unifiedBody.html : unifiedBody.text!,
       snippet: msg.snippet,
-      fullBody: "",
-      isRead: true,
-      type: "text/html",
+      isRead: !msg.labelIds?.includes("UNREAD"),
+      type: unifiedBody.type,
+      accountId: userId,
     }
   })
 }
@@ -197,11 +234,11 @@ export async function fetchGmailInbox(
   nextPageToken?: string,
 ): Promise<{ messages: EmailMessageType[]; nextPageToken: string }> {
   const { messages: messageIds, nextPageToken: newPageToken } =
-    await listMessageIds(accessToken, userId, nextPageToken)
+    await listThreadsIds(accessToken, userId, nextPageToken)
   const messages: EmailMessageType[] = []
 
   for (const messageId of messageIds) {
-    const email = await getMessage(accessToken, messageId, userId)
+    const email = await getMessage({ accessToken, messageId, userId })
     messages.push(email)
   }
 

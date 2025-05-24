@@ -35,6 +35,9 @@ export type GmailMessageResponseType = z.infer<
 export type GmailMessagesResponseType = z.infer<
   typeof ZodUtils.GmailMessagesResponseSchema
 >
+export type GmailThreadsResponseType = z.infer<
+  typeof ZodUtils.GmailThreadsResponseSchema
+>
 export type GmailThreadResponseType = z.infer<
   typeof ZodUtils.GmailThreadResponseSchema
 >
